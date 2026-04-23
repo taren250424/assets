@@ -7,11 +7,12 @@ CanDriver::~CanDriver() {
 	close();
 }
 
-bool CanDriver::open(const std::string& name, OnOpenCallback on_open_cb, int reconnect_interval_ms) {
+bool CanDriver::open(const std::string& name, OnOpenCallback on_open_cb, OnFailCallback on_fail_cb, int reconnect_interval_ms) {
 	std::lock_guard<std::recursive_mutex> lock(mtx_);
 
 	interface_name_ = name;
 	on_open_cb_ = on_open_cb;
+	on_fail_cb_ = on_fail_cb;
 	reconnect_interval_ms_ = reconnect_interval_ms;
 	last_reconnect_attempt_ = std::chrono::steady_clock::now();
 
@@ -49,13 +50,34 @@ bool CanDriver::openSocket() {
 	// ioctl        : I/O control, system call to control device/driver.
 	// SIOCGIFINDEX : Command code to get interface index (name -> number).
 	// After ioctl(), ifr.ifr_ifindex contains the index number.
-	ifreq ifr{};
-	std::strcpy(ifr.ifr_name, interface_name_.c_str());
-	int ifindex_result = ioctl(sock_, SIOCGIFINDEX, &ifr);
+	// 1. Get Interface Index
+	ifreq ifr_idx{};
+	std::strcpy(ifr_idx.ifr_name, interface_name_.c_str());
+
+	// 'sock_' is passed to ioctl merely as a required handle/channel to query the kernel.
+	// It does NOT connect or bind the socket to the interface yet.
+	int ifindex_result = ioctl(sock_, SIOCGIFINDEX, &ifr_idx);
 	if (ifindex_result < 0) {
-		printf("[CanDriver] Failed to find interface %s\n", interface_name_.c_str());
+		printf("[CanDriver] Failed to find interface %s. Calling fail callback if any...\n", interface_name_.c_str());
+		if (on_fail_cb_) on_fail_cb_();
+		
 		closeSocket();
 		return false;
+	}
+
+	// 2. Check if Interface is UP
+	ifreq ifr_flg{};
+	std::strcpy(ifr_flg.ifr_name, interface_name_.c_str());
+	
+	// SIOCGIFFLAGS : Command code to get interface flags.
+	if (ioctl(sock_, SIOCGIFFLAGS, &ifr_flg) >= 0) {
+		if (!(ifr_flg.ifr_flags & IFF_UP)) {
+			printf("[CanDriver] Interface %s is DOWN. Calling fail callback if any...\n", interface_name_.c_str());
+			if (on_fail_cb_) on_fail_cb_();
+			
+			closeSocket();
+			return false;
+		}
 	}
 
 	// Prepare CAN address structure for binding to read/write on the interface.
@@ -66,12 +88,12 @@ bool CanDriver::openSocket() {
 	// By convention, PF is used for sockets and AF is used for addresses.
 	sockaddr_can addr{};
 	addr.can_family = AF_CAN;
-	addr.can_ifindex = ifr.ifr_ifindex;
+	addr.can_ifindex = ifr_idx.ifr_ifindex; // Use the index cleanly from our first struct
 
 	// bind() is a system call that accepts generic sockaddr* for all protocols.
-	int socket_bind_ret = bind(sock_, (struct sockaddr*)&addr, sizeof(addr));
+	int socket_bind_ret = ::bind(sock_, (struct sockaddr*)&addr, sizeof(addr));
 	if (socket_bind_ret < 0) {
-		printf("[CanDriver] Failed to bind to %s (check permissions or interface state)\n", interface_name_.c_str());
+		printf("[CanDriver] Failed to bind to %s. errno=%d (%s)\n", interface_name_.c_str(), errno, strerror(errno));
 		closeSocket();
 		return false;
 	}

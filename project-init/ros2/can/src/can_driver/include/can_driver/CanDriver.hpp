@@ -19,6 +19,7 @@ public:
 	~CanDriver();
 
 	using OnOpenCallback = std::function<void()>;
+	using OnFailCallback = std::function<void()>;
 
 	/**
    * @brief Initializes the CAN interface settings and performs the initial open.
@@ -32,7 +33,7 @@ public:
    * @note Even if this returns false, the driver will store the settings 
 	 * and automatically attempt to reconnect during subsequent read() or write() calls.
    */
-	bool open(const std::string& name, OnOpenCallback on_open_cb = nullptr, int reconnect_interval_ms = 1000);
+	bool open(const std::string& name, OnOpenCallback on_open_cb = nullptr, OnFailCallback on_fail_cb = nullptr, int reconnect_interval_ms = 1000);
 	void close();
 
 	/**
@@ -58,6 +59,7 @@ private:
 	std::chrono::steady_clock::time_point last_reconnect_attempt_;
 
 	OnOpenCallback on_open_cb_;
+	OnFailCallback on_fail_cb_;
 
 	bool openSocket();
 	void closeSocket();
