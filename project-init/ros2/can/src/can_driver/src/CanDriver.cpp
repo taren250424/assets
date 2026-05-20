@@ -128,27 +128,31 @@ void CanDriver::closeSocket() {
 }
 
 bool CanDriver::read(can_frame& frame) {
-	std::lock_guard<std::recursive_mutex> lock(mtx_);
+	int s_copy = -1;
+	{
+		std::lock_guard<std::recursive_mutex> lock(mtx_);
 
-	// If socket is not connected, try reconncecting.
-	// Prepare for next attempt.
-	// This read() fails, but will retry in next polling.
-	if (sock_ < 0) {
-		if (shouldRetryReconnect()) {
-			openSocket();
+		// If socket is not connected, try reconncecting.
+		// Prepare for next attempt.
+		// This read() fails, but will retry in next polling.
+		if (sock_ < 0) {
+			if (shouldRetryReconnect()) {
+				openSocket();
+			}
+			return false;
 		}
-
-		return false;
+		s_copy = sock_;
 	}
 
 	// If read() fails, 'errno' is set automatically by the system.
-	int nbytes = ::read(sock_, &frame, sizeof(frame));
+	int nbytes = ::read(s_copy, &frame, sizeof(frame));
 
 	// CAN messages are atomic so always read a complete frame or nothing.
 	// EAGAIN and EWOULDBLOCK mean 'no data available right now so try again later',
 	// If nbytes is -1 and it's NOT these flags, it means it's not just a 'no data' situation
 	// but a real communication error. In this case, we close and try to reopen the socket.
 	if (nbytes < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
+		std::lock_guard<std::recursive_mutex> lock(mtx_);
 		closeSocket();
 		if (shouldRetryReconnect()) {
 			openSocket();
@@ -160,18 +164,23 @@ bool CanDriver::read(can_frame& frame) {
 }
 
 bool CanDriver::write(const can_frame& frame) {
-	std::lock_guard<std::recursive_mutex> lock(mtx_);
+	int s_copy = -1;
+	{
+		std::lock_guard<std::recursive_mutex> lock(mtx_);
 
-	if (sock_ < 0) {
-		if (shouldRetryReconnect()) {
-			openSocket();
+		if (sock_ < 0) {
+			if (shouldRetryReconnect()) {
+				openSocket();
+			}
+			return false;
 		}
-		return false;
+		s_copy = sock_;
 	}
 
-	int nbytes = ::write(sock_, &frame, sizeof(frame));
+	int nbytes = ::write(s_copy, &frame, sizeof(frame));
 
 	if (nbytes < 0) {
+		std::lock_guard<std::recursive_mutex> lock(mtx_);
 		closeSocket();
 		if (shouldRetryReconnect()) {
 			openSocket();
