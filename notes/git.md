@@ -1,8 +1,8 @@
 ## Basic
 git init  
 git branch -m main  
-git remote add origin https://github.com/hn250424  
-git remote set-url origin https://github.com/hn250424  
+git remote add origin https://github.com/taren250424  
+git remote set-url origin https://github.com/taren250424  
 git remote -v  
 git pull *-u origin main*  
 git status  
