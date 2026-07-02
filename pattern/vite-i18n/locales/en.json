@@ -1,0 +1,11 @@
+{
+    "_meta": { "htmlLang": "en" },
+    "app": {
+        "title": "Demo",
+        "heading": "Welcome",
+        "namePlaceholder": "Enter your name",
+        "submit": "OK",
+        "hello": "Hello,",
+        "emptyName": "Please enter your name."
+    }
+}

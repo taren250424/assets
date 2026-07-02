@@ -1,0 +1,23 @@
+<!doctype html>
+<!--
+  [파일 설명] t/brand 플레이스홀더 데모 페이지.
+  플레이스홀더는 vite.config.ts 의 transformIndexHtml 훅이
+  APP_LANG / APP_BRAND 에 맞춰 빌드타임(dev 서버 포함)에 치환한다.
+  (주석 안이라도 플레이스홀더 문법을 쓰면 함께 치환되므로 여기선 풀어 썼다.)
+-->
+<html lang="{{t:_meta.htmlLang}}">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{brand}} - {{t:app.title}}</title>
+  </head>
+  <body>
+    <h1>{{brand}}</h1>
+    <form id="greet-form">
+      <h2>{{t:app.heading}}</h2>
+      <input id="name-input" type="text" placeholder="{{t:app.namePlaceholder}}" />
+      <button type="submit">{{t:app.submit}}</button>
+      <p id="msg"></p>
+    </form>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

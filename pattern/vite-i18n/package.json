@@ -1,0 +1,19 @@
+{
+    "name": "vite-i18n",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "dev:en": "cross-env APP_LANG=en vite",
+        "build": "tsc && vite build",
+        "build:en": "cross-env APP_LANG=en vite build",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0",
+        "cross-env": "^7.0.3",
+        "typescript": "~5.8.3",
+        "vite": "^7.0.4"
+    }
+}

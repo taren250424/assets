@@ -1,0 +1,11 @@
+{
+    "_meta": { "htmlLang": "ko" },
+    "app": {
+        "title": "데모",
+        "heading": "환영합니다",
+        "namePlaceholder": "이름 입력",
+        "submit": "확인",
+        "hello": "안녕하세요,",
+        "emptyName": "이름을 입력하세요."
+    }
+}
