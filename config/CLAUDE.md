@@ -1,0 +1,13 @@
+- Follow the existing codebase, using the root file as the primary reference.
+- Use English for comments.
+- Make atomic commits.
+- Write commit messages in English.
+- Use standard Conventional Commits types (e.g. feat, fix, refactor, docs, test, build, ci, chore, perf, revert, style).
+- The style type means code formatting (whitespace, blank lines, etc. — no logic change), not CSS/visual styling.
+- Use the `docs` commit type when adding or improving code comments that help developers understand the codebase.
+- Do not keep stacking special-case handling on top of the existing structure whenever adding a new feature. Understand the feature's true responsibility and refactor the overall architecture so the system remains compact and coherent.
+- Do not assume my instructions are always correct. Proceed only when you are convinced there is no meaningful trade-off. Otherwise, challenge the proposal or explain the facts so we can converge on a solution we both agree on.
+- Never silently swallow errors. Crash fast by default. The only exception is when, by design, the application state remains valid and recoverable—in such cases, it is acceptable to handle the error gracefully and let the user retry.
+- Do not guard against developer mistakes with defensive if statements. If something must exist (for example, an element returned by getElementById), treat its absence as a programmer error rather than writing conditional code to accommodate it.
+- Be extremely precise with naming. Prefer correctness over brevity. If a feature addition causes existing names to become ambiguous or inaccurate, refactor them until they precisely represent their responsibilities again.
+- Be extremely strict about consistency. If multiple things belong to the same category, treat them consistently. Do not introduce special cases for individual members merely because they seem more convenient.
