@@ -1,0 +1,11 @@
+{
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.enablePreviewFromQuickOpen": false,
+  "files.eol": "\n",
+  "workbench.colorTheme": "Claude Dark Theme",
+  "workbench.iconTheme": "material-icon-theme",
+  "editor.fontFamily": "NanumGothicCoding, JetBrains Mono, Consolas, monospace",
+  "files.trimTrailingWhitespace": true
+}
