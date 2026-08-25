@@ -11,4 +11,4 @@
 - Do not guard against developer mistakes with defensive if statements. If something must exist (for example, an element returned by getElementById), treat its absence as a programmer error rather than writing conditional code to accommodate it.
 - Be extremely precise with naming. Prefer correctness over brevity. If a feature addition causes existing names to become ambiguous or inaccurate, refactor them until they precisely represent their responsibilities again.
 - Be extremely strict about consistency. If multiple things belong to the same category, treat them consistently. Do not introduce special cases for individual members merely because they seem more convenient.
-- Keep comments as concise as possible, focusing only on the essentials. Add a few more lines only when the intent could be misunderstood without further explanation.
+- Avoid comments by default. Add a concise comment only when the code's intent or non-obvious reasoning would otherwise be misunderstood. Do not comment on obvious behavior or restate what the code already expresses.
